@@ -7,24 +7,6 @@ route add default gw 172.30.30.1
 iptables -t nat -A POSTROUTING -o enp0s8 -j MASQUERADE
 
 ##
-sudo sysctl -w net.ipv4.ip_forward=1
-sudo sysctl -w net.ipv6.conf.all.forwarding=1
-sudo sysctl -w net.ipv4.conf.all.accept_redirects=0
-sudo sysctl -w net.ipv4.conf.all.send_redirects=0
-sudo sysctl -p
-
-sudo echo \
-"
-*nat
-:POSTROUTING ACCEPT [0:0]
--A POSTROUTING -s 10.1.0.0/24 -d 10.2.0.0/24 -j MASQUERADE
-COMMIT
-" \
-| sudo cat - /etc/ufw/before.rules | sudo tee temp && sudo mv temp /etc/ufw/before.rules
-
-sudo ufw disable 
-sudo ufw enable
-
 sudo echo \
 "
 config setup
