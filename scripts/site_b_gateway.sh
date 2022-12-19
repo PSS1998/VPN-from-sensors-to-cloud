@@ -18,7 +18,7 @@ conn client2-to-server
         left=172.18.18.18
         leftsubnet=10.1.0.1/24
         right=172.30.30.30
-        rightsubnet=10.2.0.1/24
+        rightsubnet=10.2.0.3
         ike=aes256-sha1-modp1024!
         esp=aes256-sha1!
         aggressive=no
@@ -42,6 +42,8 @@ unset secret
 sudo ipsec restart
 
 sudo iptables -t nat -I POSTROUTING 1 -m policy --pol ipsec --dir out -j ACCEPT
+
+sudo iptables -A PREROUTING -t nat -d 10.2.0.1 -j DNAT --to-destination 10.2.0.3
 ##
 
 ## Save the iptables rules
