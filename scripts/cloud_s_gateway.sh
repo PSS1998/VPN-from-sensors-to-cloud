@@ -18,7 +18,7 @@ conn server-to-client
         keyexchange=ikev2
         authby=secret
         left=172.30.30.30
-        leftsubnet=10.2.0.1/24
+        leftsubnet=10.2.0.2
         right=172.16.16.16
         rightsubnet=10.1.0.1/24
         ike=aes256-sha1-modp1024!
@@ -36,7 +36,7 @@ conn server-to-client2
         keyexchange=ikev2
         authby=secret
         left=172.30.30.30
-        leftsubnet=10.2.0.1/24
+        leftsubnet=10.2.0.3
         right=172.18.18.18
         rightsubnet=10.1.0.1/24
         ike=aes256-sha1-modp1024!
@@ -66,8 +66,11 @@ sudo ipsec restart
 
 sudo iptables -t nat -I POSTROUTING 1 -m policy --pol ipsec --dir out -j ACCEPT
 
-sudo iptables -A PREROUTING -t nat -s 172.16.16.16 -j DNAT --to-destination 10.2.0.2
-sudo iptables -A PREROUTING -t nat -s 172.18.18.18 -j DNAT --to-destination 10.2.0.3
+sudo iptables -t mangle -A PREROUTING -s 172.16.16.16 -j MARK --set-mark 1
+sudo iptables -t mangle -A PREROUTING -s 172.18.18.18 -j MARK --set-mark 2
+
+sudo iptables -A PREROUTING -t nat -m mark --mark 1 -m policy --pol ipsec --dir in -j DNAT --to-destination 10.2.0.2
+sudo iptables -A PREROUTING -t nat -m mark --mark 2 -m policy --pol ipsec --dir in -j DNAT --to-destination 10.2.0.3
 ##
 
 ## Save the iptables rules
